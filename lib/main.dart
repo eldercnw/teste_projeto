@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
-
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:supabase/supabase.dart';
 
 void main() {
   runApp(const MyApp());
@@ -55,18 +55,31 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() async {
-    final pdf = pw.Document();
+    const supabaseUrl = 'https://hlqvdyiermmwbzjhvpsn.supabase.co';
+    const supabaseKey =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYzMjkzNjk0MywiZXhwIjoxOTQ4NTEyOTQzfQ.sYbCbLpLfI9YFqA0KiY15vMLg4JQOUm1v83jXuimcP8';
+    final client = SupabaseClient(supabaseUrl, supabaseKey);
 
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) => pw.Center(
-          child: pw.Text('Hello World!'),
-        ),
-      ),
-    );
+    // Select from table `countries` ordering by `name`
+    final response = await client
+        .from('countries')
+        .select()
+        .order('nome', ascending: true)
+        .execute();
 
-    await Printing.layoutPdf(
-        onLayout: (PdfPageFormat format) async => pdf.save());
+    print(response.data[0]);
+    // final pdf = pw.Document();
+
+    // pdf.addPage(
+    //   pw.Page(
+    //     build: (pw.Context context) => pw.Center(
+    //       child: pw.Text('Hello World!'),
+    //     ),
+    //   ),
+    // );
+
+    // await Printing.layoutPdf(
+    //     onLayout: (PdfPageFormat format) async => pdf.save());
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
